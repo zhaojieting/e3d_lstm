@@ -147,6 +147,8 @@ def train_wrapper(model):
   eta = FLAGS.sampling_start_value
 
   for itr in range(1, FLAGS.max_iterations + 1):
+    import time
+    start = time.time()
     if train_input_handle.no_batch_left():
       train_input_handle.begin(do_shuffle=True)
     ims = train_input_handle.get_batch()
@@ -159,6 +161,8 @@ def train_wrapper(model):
     trainer.train(model, ims, real_input_flag, FLAGS, itr)
 
     if itr % FLAGS.snapshot_interval == 0:
+      end = time.time()
+      print('train_time_cost: {}'.format(end - start))
       model.save(itr)
 
     if itr % FLAGS.test_interval == 0:

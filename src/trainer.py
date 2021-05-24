@@ -55,6 +55,8 @@ def train(model, ims, real_input_flag, configs, itr):
     print(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
           'itr: ' + str(itr))
     print('training loss: ' + str(cost))
+    with open('e3d_lstm.txt', 'wa') as f:
+        f.write('itr: ' + str(itr) + '\ntraining loss: ' + str(cost) +'\n')
 
 
 def test(model, test_input_handle, configs, save_name):
@@ -99,8 +101,8 @@ def test(model, test_input_handle, configs, save_name):
       mse = np.square(x - gx).sum()
       img_mse[i] += mse
       avg_mse += mse
-      # for b in range(configs.batch_size):
-      #     ssim[i] += compare_ssim(x[b], gx[b], multichannel=True)
+      for b in range(configs.batch_size):
+          ssim[i] += compare_ssim(x[b], gx[b], multichannel=True)
       x = np.uint8(x * 255)
       gx = np.uint8(gx * 255)
       psnr[i] += batch_psnr(gx, x)
@@ -140,7 +142,7 @@ def test(model, test_input_handle, configs, save_name):
   for i in range(output_length):
     print(psnr[i])
 
-  # ssim = np.asarray(ssim, dtype=np.float32) / (configs.batch_size * batch_id)
-  # print('ssim per frame: ' + str(np.mean(ssim)))
-  # for i in range(output_length):
-  #     print(ssim[i])
+  ssim = np.asarray(ssim, dtype=np.float32) / (configs.batch_size * batch_id)
+  print('ssim per frame: ' + str(np.mean(ssim)))
+  for i in range(output_length):
+      print(ssim[i])

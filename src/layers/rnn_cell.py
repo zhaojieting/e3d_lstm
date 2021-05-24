@@ -20,6 +20,7 @@ from __future__ import print_function
 
 import tensorflow as tf
 import tensorflow.contrib.layers as layers
+from src.layers.tsm  import TSM_layer
 
 
 class EideticLSTMCell(object):
@@ -39,7 +40,8 @@ class EideticLSTMCell(object):
                norm_gain=1.0,
                norm_shift=0.0,
                forget_bias=1.0,
-               name="eidetic_lstm_cell"):
+               name="eidetic_lstm_cell",
+               layer=0):
     """Construct EideticLSTMCell.
 
     Args:
@@ -164,8 +166,12 @@ class EideticLSTMCell(object):
       return tf.layers.conv2d(
           inputs, output_channels, kernel_shape, padding="same")
     elif self._conv_ndims == 3:
+      if self._layer_name ==
       return tf.layers.conv3d(
           inputs, output_channels, kernel_shape, padding="same")
+    elif self._conv_ndims == 4:
+      return TSM_layer(
+        inputs, output_channels, kernel_shape, padding="same")
 
   def __call__(self, inputs, hidden, cell, global_memory, eidetic_cell):
     with tf.variable_scope(self._layer_name):
@@ -240,4 +246,17 @@ class Eidetic3DLSTMCell(EideticLSTMCell):
 
   def __init__(self, name="eidetic_3d_lstm_cell", **kwargs):
     """Construct Eidetic3DLSTMCell. See `EideticLSTMCell` for more details."""
-    super(Eidetic3DLSTMCell, self).__init__(conv_ndims=3, name=name, **kwargs)
+    super(Eidetic3DLSTMCell, self).__init__(conv_ndims=4, name=name, **kwargs)
+
+
+class Eidetic3DLSTMCell(EideticLSTMCell):
+  """3D Eidetic LSTM recurrent network cell.
+
+  Implements the model as described in
+  Wang, Yunbo, et al. "Eidetic 3D LSTM: A Model for Video Prediction and
+  Beyond.", ICLR (2019). https://openreview.net/pdf?id=B1lKS2AqtX
+  """
+
+  def __init__(self, name="eidetic_3d_lstm_cell", **kwargs):
+    """Construct Eidetic3DLSTMCell. See `EideticLSTMCell` for more details."""
+    super(Eidetic3DLSTMCell, self).__init__(conv_ndims=4, name=name, **kwargs)
